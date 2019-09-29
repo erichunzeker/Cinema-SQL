@@ -1,0 +1,11 @@
+venv
+.idea
+*pycache*
+bin
+**/*release
+**/*.swp
+**/*.swo
+
+.DS_Store
+cs1656.sqlite
+q*.csv
