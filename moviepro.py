@@ -113,55 +113,67 @@ def main():
 	# 	# We will grade your program based on the output files q01.csv,
 	# 	# q02.csv, ..., q12.csv
 	#
-	# 	# Q01 ########################
-	# 	queries['q01'] = '''
-	# '''
-	#
+	# Q01 - List all the actors (first and last name) who acted in at least one film in the 80s (1980-1990,
+	# 	both ends inclusive) and in at least one film in the 21st century (>=2000). Sort alphabetically,
+	# 	by the actor's last and first name.
+		queries['q01'] = '''
+	'''
+
 	# 	# Q02 ########################
-	# 	queries['q02'] = '''
-	# '''
-	#
+		queries['q02'] = '''
+	'''
+
 	# 	# Q03 ########################
-	# 	queries['q03'] = '''
-	# '''
-	#
-	# 	# Q04 ########################
-	# 	queries['q04'] = '''
-	# '''
-	#
+		queries['q03'] = '''
+	'''
+
+	# Q04 - Find the actor(s)(first and last name) who only acted in films released before 1985. Sort alphabetically,
+	# 	by the actor's last and first name.
+
+		queries['q04'] = '''
+	SELECT fname, lname
+	FROM Actors as A
+	INNER JOIN Cast as C on A.aid = C.aid
+	WHERE C.mid IN (
+		SELECT mid 
+		FROM Movies
+		WHERE year < 1985)
+	ORDER BY A.lname, A.fname ASC
+	;
+	'''
+
 	# 	# Q05 ########################
-	# 	queries['q05'] = '''
-	# '''
-	#
+		queries['q05'] = '''
+	'''
+
 	# 	# Q06 ########################
-	# 	queries['q06'] = '''
-	# '''
-	#
+		queries['q06'] = '''
+	'''
+
 	# 	# Q07 ########################
-	# 	queries['q07'] = '''
-	# '''
-	#
+		queries['q07'] = '''
+	'''
+
 	# 	# Q08 ########################
-	# 	queries['q08'] = '''
-	# '''
-	#
+		queries['q08'] = '''
+	'''
+
 	# 	# Q09 ########################
-	# 	queries['q09'] = '''
-	# '''
-	#
+		queries['q09'] = '''
+	'''
+
 	# 	# Q10 ########################
-	# 	queries['q10'] = '''
-	# '''
-	#
+		queries['q10'] = '''
+	'''
+
 	# 	# Q11 ########################
-	# 	queries['q11'] = '''
-	# '''
-	#
+		queries['q11'] = '''
+	'''
+
 	# 	# Q12 ########################
-	# 	queries['q12'] = '''
-	# '''
-	#
-	#
+		queries['q12'] = '''
+	'''
+
 	# 	########################################################################
 	# 	### SAVE RESULTS TO FILES ##############################################
 	# 	########################################################################
