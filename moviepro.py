@@ -119,10 +119,9 @@ def main():
 		queries['q01'] = '''
 	SELECT fname, lname 
 	FROM Actors
-	WHERE aid in (SELECT aid FROM Movies as M INNER JOIN Cast as C on M.mid = C.mid where M.year >= 1980 and M.year <= 1990)
-			AND aid in
-		(SELECT aid FROM Movies as M INNER JOIN Cast as C on M.mid = C.mid where M.year >= 2000)
-	; 
+	WHERE aid in (SELECT aid FROM Movies as M1 INNER JOIN Cast as C1 on M1.mid = C1.mid where M1.year >= 1980 and M1.year <= 1990 
+			INTERSECT 
+		SELECT aid FROM Movies as M2 INNER JOIN Cast as C2 on M2.mid = C2.mid where M2.year >= 2000); 
 	'''
 
 	# Q02 - List all the movies (title, year) that were released in the same year as the movie entitled "Rogue One: A
