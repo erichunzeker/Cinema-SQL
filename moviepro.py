@@ -117,13 +117,31 @@ def main():
 	# 	both ends inclusive) and in at least one film in the 21st century (>=2000). Sort alphabetically,
 	# 	by the actor's last and first name.
 		queries['q01'] = '''
+	SELECT fname, lname
+	FROM Actors as A
+	INNER JOIN Cast as C on A.aid = C.aid
+	WHERE C.mid IN (
+		SELECT mid 
+		FROM Movies
+		WHERE year >= 1980 AND year <= 1990)
+	ORDER BY A.lname, A.fname ASC;
 	'''
 
-	# 	# Q02 ########################
+	# Q02 - List all the movies (title, year) that were released in the same year as the movie entitled "Rogue One: A
+		# Star Wars Story", but had a better rank (Note: the higher the value in the rank attribute, the better the
+		# rank of the movie). Sort alphabetically, by movie title.
 		queries['q02'] = '''
+	SELECT title, year
+	FROM Movies
+	WHERE year = (SELECT year FROM Movies as M WHERE M.title = 'Rogue One: A Star Wars Story') and rank > 
+		(SELECT rank FROM Movies as M WHERE M.title = 'Rogue One: A Star Wars Story')
+	ORDER BY title ASC;
 	'''
 
-	# 	# Q03 ########################
+	# Q03 - List all the actors (first and last name) who played in a Star Wars movie (i.e., title like '%Star Wars%')
+		#  in decreasing order of how many Star Wars movies they appeared in. If an actor plays multiple roles in the
+		# same movie, count that still as one movie. If there is a tie, use the actor's last and first name to
+		# generate a full sorted order.
 		queries['q03'] = '''
 	'''
 
