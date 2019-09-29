@@ -140,6 +140,11 @@ def main():
 		# same movie, count that still as one movie. If there is a tie, use the actor's last and first name to
 		# generate a full sorted order.
 		queries['q03'] = '''
+	SELECT fname, lname
+	FROM Actors as A
+	WHERE aid in (SELECT aid, count(aid) as C FROM Movies as M INNER JOIN Cast as C on M.mid = C.mid WHERE M.title LIKE '%Star Wars%')
+	ORDER BY C	
+	;
 	'''
 
 	# Q04 - Find the actor(s)(first and last name) who only acted in films released before 1985. Sort alphabetically,
@@ -160,8 +165,16 @@ def main():
 		queries['q05'] = '''
 	'''
 
-	# 	# Q06 ########################
+	# Q06 - Find the top 10 movies with the largest cast (title, number of cast members) in decreasing order. Note:
+		# show all movies in case of a tie.
+		# todo: add ties
 		queries['q06'] = '''
+	SELECT title, count(title)
+	FROM Movies as M 
+	INNER JOIN Cast as C on M.mid = C.mid
+	GROUP BY title
+	ORDER BY count(title) DESC 
+	LIMIT 10;
 	'''
 
 	# 	# Q07 ########################
