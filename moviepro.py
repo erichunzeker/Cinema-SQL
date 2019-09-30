@@ -161,8 +161,16 @@ def main():
 	;
 	'''
 
-	# 	# Q05 ########################
+	# Q05 - List the top 20 directors in descending order of the number of films they directed (first name, last name,
+		#  number of films directed). For simplicity, feel free to ignore ties at the number 20 spot (i.e.,
+		# always show up to 20 only).
 		queries['q05'] = '''
+	SELECT fname, lname, count(M.did)
+	FROM Movie_Director as M 
+	INNER JOIN Directors as D on M.did = D.did
+	GROUP BY M.did
+	ORDER BY count(M.did) DESC 
+	LIMIT 20;
 	'''
 
 	# Q06 - Find the top 10 movies with the largest cast (title, number of cast members) in decreasing order. Note:
