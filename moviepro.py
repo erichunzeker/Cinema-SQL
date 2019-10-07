@@ -124,16 +124,6 @@ def main():
 		SELECT aid FROM Movies as M2 INNER JOIN Cast as C2 on M2.mid = C2.mid where M2.year >= 2000); 
 	'''
 
-
-
-
-
-
-
-
-
-
-
 	# Q02 - List all the movies (title, year) that were released in the same year as the movie entitled "Rogue One: A
 		# Star Wars Story", but had a better rank (Note: the higher the value in the rank attribute, the better the
 		# rank of the movie). Sort alphabetically, by movie title.
@@ -181,10 +171,6 @@ def main():
 		WHERE year < 1985)
 	ORDER BY A.lname, A.fname ASC;
 	'''
-
-
-
-
 
 	# Q05 - List the top 20 directors in descending order of the number of films they directed (first name, last name,
 		#  number of films directed). For simplicity, feel free to ignore ties at the number 20 spot (i.e.,
@@ -268,15 +254,22 @@ def main():
 		# year (i.e., year of their first movie). Show the actor's first and last name, plus the count. Sort by
 		# decreasing order of the count.
 		queries['aa1'] = '''
-		'''
-
-	# 	queries['q09'] = '''
-	# SELECT ac
-	# FROM Actors a, actor_counts
-	# WHERE (lower(a.fname) LIKE 'T%');
-	# '''
-
-
+	CREATE VIEW qualifying AS
+	SELECT a.aid, min(m.year) as yc
+	FROM Movies m, Actors a, Cast c
+	WHERE m.mid = c.mid AND a.aid = c.aid AND c.aid IN (
+		SELECT a1.aid 
+		FROM Actors	a1
+		WHERE lower(a1.fname) LIKE 'T%'
+	)
+	GROUP BY a.aid;
+	'''
+		queries['q09'] = '''
+	SELECT *
+	FROM qualifying q, Actors a, Cast c, Movies m
+	WHERE q.aid = a.aid AND q.yc = m.year AND c.mid = m.mid AND c.aid = q.aid
+	GROUP BY a.aid
+	'''
 
 
 
@@ -286,8 +279,6 @@ def main():
 		# sorted alphabetically by last name.
 		queries['q10'] = '''
 	'''
-
-
 
 
 
