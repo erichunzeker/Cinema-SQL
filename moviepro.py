@@ -265,10 +265,11 @@ def main():
 	GROUP BY a.aid;
 	'''
 		queries['q09'] = '''
-	SELECT *
+	SELECT a.fname, a.lname, count(q.aid)
 	FROM qualifying q, Actors a, Cast c, Movies m
 	WHERE q.aid = a.aid AND q.yc = m.year AND c.mid = m.mid AND c.aid = q.aid
-	GROUP BY a.aid
+	GROUP BY q.aid
+	ORDER BY count(q.aid) desc 
 	'''
 
 
