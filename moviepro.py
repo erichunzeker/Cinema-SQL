@@ -10,9 +10,7 @@ def main():
 	with con:
 		cur = con.cursor()
 
-		########################################################################
-		### CREATE TABLES ######################################################
-		########################################################################
+		# CREATE TABLES
 		# DO NOT MODIFY - START
 		cur.execute('DROP TABLE IF EXISTS Actors')
 		cur.execute("CREATE TABLE Actors(aid INT, fname TEXT, lname TEXT, gender CHAR(6), PRIMARY KEY(aid))")
@@ -30,11 +28,8 @@ def main():
 		cur.execute("CREATE TABLE Movie_Director(did INT, mid INT)")
 		# DO NOT MODIFY - END
 
-		########################################################################
-		### READ DATA FROM FILES ###############################################
-		########################################################################
+		# READ DATA FROM FILES
 		# actors.csv, cast.csv, directors.csv, movie_dir.csv, movies.csv
-		# UPDATE THIS
 
 		file_in = ['actors.csv', 'cast.csv', 'directors.csv', 'movie_dir.csv', 'movies.csv']
 
@@ -76,10 +71,8 @@ def main():
 							cur.execute("INSERT INTO Movies VALUES(" + r + ")")
 		con.commit()
 
+		# QUERY SECTION
 
-		########################################################################
-		### QUERY SECTION ######################################################
-		########################################################################
 		queries = {}
 
 		# DO NOT MODIFY - START
@@ -104,15 +97,22 @@ def main():
 	SELECT * FROM Movie_Director
 	'''
 		# DO NOT MODIFY - END
-	#
-	# 	########################################################################
-	# 	### INSERT YOUR QUERIES HERE ###########################################
-	# 	########################################################################
-	# 	# NOTE: You are allowed to also include other queries here (e.g.,
-	# 	# for creating views), that will be executed in alphabetical order.
-	# 	# We will grade your program based on the output files q01.csv,
-	# 	# q02.csv, ..., q12.csv
-	#
+	# 	INSERT YOUR QUERIES HERE
+
+	# 	NOTE: You are allowed to also include other queries here (e.g.,
+	# 	for creating views), that will be executed in alphabetical order.
+	# 	We will grade your program based on the output files q01.csv,
+	# 	q02.csv, ..., q12.csv
+
+	# TODO:
+		# query 3
+		# query 6 - add ties
+		# query 7
+		# query 8
+		# query 9
+		# query 10
+		# query 12
+
 	# Q01 - List all the actors (first and last name) who acted in at least one film in the 80s (1980-1990,
 	# 	both ends inclusive) and in at least one film in the 21st century (>=2000). Sort alphabetically,
 	# 	by the actor's last and first name.
@@ -123,6 +123,16 @@ def main():
 			INTERSECT 
 		SELECT aid FROM Movies as M2 INNER JOIN Cast as C2 on M2.mid = C2.mid where M2.year >= 2000); 
 	'''
+
+
+
+
+
+
+
+
+
+
 
 	# Q02 - List all the movies (title, year) that were released in the same year as the movie entitled "Rogue One: A
 		# Star Wars Story", but had a better rank (Note: the higher the value in the rank attribute, the better the
@@ -135,17 +145,29 @@ def main():
 	ORDER BY title ASC;
 	'''
 
+
+
+
+
+
+
 	# Q03 - List all the actors (first and last name) who played in a Star Wars movie (i.e., title like '%Star Wars%')
 		# in decreasing order of how many Star Wars movies they appeared in. If an actor plays multiple roles in the
 		# same movie, count that still as one movie. If there is a tie, use the actor's last and first name to
 		# generate a full sorted order.
-		queries['q03'] = '''
-	SELECT fname, lname
-	FROM Actors as A
-	WHERE aid in (SELECT aid, count(aid) as C FROM Movies as M INNER JOIN Cast as C on M.mid = C.mid WHERE M.title LIKE '%Star Wars%')
-	ORDER BY C	
-	;
-	'''
+		# todo: a lot lel
+	# 	queries['q03'] = '''
+	# SELECT fname, lname
+	# FROM Actors as A
+	# WHERE aid in (SELECT aid, count(aid) as C FROM Movies as M INNER JOIN Cast as C on M.mid = C.mid WHERE M.title LIKE '%Star Wars%')
+	# ORDER BY C	;
+	# '''
+
+
+
+
+
+
 
 	# Q04 - Find the actor(s)(first and last name) who only acted in films released before 1985. Sort alphabetically,
 	# 	by the actor's last and first name.
@@ -157,9 +179,12 @@ def main():
 		SELECT mid 
 		FROM Movies
 		WHERE year < 1985)
-	ORDER BY A.lname, A.fname ASC
-	;
+	ORDER BY A.lname, A.fname ASC;
 	'''
+
+
+
+
 
 	# Q05 - List the top 20 directors in descending order of the number of films they directed (first name, last name,
 		#  number of films directed). For simplicity, feel free to ignore ties at the number 20 spot (i.e.,
@@ -173,41 +198,151 @@ def main():
 	LIMIT 20;
 	'''
 
+
+
+
+
+
+
+
 	# Q06 - Find the top 10 movies with the largest cast (title, number of cast members) in decreasing order. Note:
 		# show all movies in case of a tie.
 		# todo: add ties
-		queries['q06'] = '''
-	SELECT title, count(title)
-	FROM Movies as M 
-	INNER JOIN Cast as C on M.mid = C.mid
-	GROUP BY title
-	ORDER BY count(title) DESC 
-	LIMIT 10;
+	# 	queries['q06'] = '''
+	# # SELECT title, count(title)
+	# # FROM Movies as M
+	# # INNER JOIN Cast as C on M.mid = C.mid
+	# # GROUP BY title
+	# # ORDER BY count(title) DESC
+	# # LIMIT 10;
+	# '''
+		queries['a1'] = '''
+	CREATE VIEW frequencies as
+	select m.title, count(aid) as cast_cnt
+	from Movies m, Cast c
+	where m.mid = c.mid
+	group by m.title;
 	'''
+		queries['q06'] = '''
+	SELECT *
+	FROM frequencies
+	ORDER BY cast_cnt DESC;
+		'''
+		# WHERE cast_cnt = (select max(cast_cnt) from frequencies)
 
-	# 	# Q07 ########################
+
+
+
+
+
+
+
+	# Q07 - Find the movie(s) whose cast has more actresses than actors (i.e., gender=female vs gender=male). Show the
+		# title, the number of actresses, and the number of actors in the results. Sort alphabetically,
+		# by movie title.
 		queries['q07'] = '''
 	'''
 
-	# 	# Q08 ########################
+
+
+
+
+
+
+
+	# Q08 - Find all the actors who have worked with at least 7 different directors. Do not consider cases of
+		# self-directing (i.e., when the director is also an actor in a movie), but count all directors in a movie
+		# towards the threshold of 7 directors. Show the actor's first, last name, and the number of directors he/she
+		# has worked with. Sort in decreasing order of number of directors.
 		queries['q08'] = '''
 	'''
 
-	# 	# Q09 ########################
-		queries['q09'] = '''
-	'''
 
-	# 	# Q10 ########################
+
+
+
+
+
+
+	# Q09 - For all actors whose first name starts with a T, count the movies that he/she appeared in his/her debut
+		# year (i.e., year of their first movie). Show the actor's first and last name, plus the count. Sort by
+		# decreasing order of the count.
+		queries['aa1'] = '''
+		'''
+
+	# 	queries['q09'] = '''
+	# SELECT ac
+	# FROM Actors a, actor_counts
+	# WHERE (lower(a.fname) LIKE 'T%');
+	# '''
+
+
+
+
+
+
+	# Q10 - Find instances of nepotism between actors and directors, i.e., an actor in a movie and the director having
+		# the same last name, but a different first name. Show the last name and the title of the movie,
+		# sorted alphabetically by last name.
 		queries['q10'] = '''
 	'''
 
-	# 	# Q11 ########################
+
+
+
+
+
+	# Q11 - The Bacon number of an actor is the length of the shortest path between the actor and Kevin Bacon in the
+		# "co-acting" graph. That is, Kevin Bacon has Bacon number 0; all actors who acted in the same movie as him
+		# have Bacon number 1; all actors who acted in the same film as some actor with Bacon number 1 have Bacon
+		# number 2, etc. List all actors whose Bacon number is 2 (first name, last name). You can familiarize yourself
+		#  with the concept, by visiting The Oracle of Bacon.
+
+		queries['a2'] = '''
+	create view bacon1 as
+	SELECT DISTINCT c1.aid 
+	FROM Cast c1
+	WHERE c1.mid in (
+		SELECT c.mid
+		FROM Cast c
+		WHERE c.aid = (SELECT a.aid 
+						FROM Actors a
+						WHERE a.lname = 'Bacon')
+	);
+	'''
+		queries['a3'] = '''
+	create view bacon2 as
+	SELECT DISTINCT c1.aid 
+	FROM Cast c1
+	WHERE c1.mid in (
+		SELECT c.mid
+		FROM Cast c
+		WHERE c.aid in (SELECT * FROM bacon1)
+	);
+	'''
 		queries['q11'] = '''
+		SELECT a1.fname, a1.lname
+		FROM bacon2 b, Actors a1
+		WHERE b.aid = a1.aid AND b.aid NOT IN (SELECT aid from Actors a WHERE a.lname = 'Bacon');
 	'''
 
-	# 	# Q12 ########################
+
+
+
+
+
+	# Q12 - Assume that the popularity of an actor is reflected by the average rank of all the movies he/she has acted
+		# in. Find the top 20 most popular actors (in descreasing order of popularity) -- list the actor's first/last
+		# name, the total number of movies he/she has acted, and his/her popularity score. For simplicity,
+		# feel free to ignore ties at the number 20 spot (i.e., always show up to 20 only).
 		queries['q12'] = '''
+		
 	'''
+
+
+
+
+
 
 	# 	########################################################################
 	# 	### SAVE RESULTS TO FILES ##############################################
