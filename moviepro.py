@@ -229,7 +229,8 @@ def main():
 	FROM female_cast_cnt f LEFT OUTER JOIN 
 	male_cast_cnt m ON f.mid = m.mid
 	WHERE f.female_cnt > m.male_cnt OR m.male_cnt ISNULL 
-	GROUP BY f.mid;
+	GROUP BY f.mid
+	ORDER BY f.title ASC;
 	'''
 
 
