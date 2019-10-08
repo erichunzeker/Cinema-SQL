@@ -102,7 +102,6 @@ def main():
 	# TODO:
 		# query 3
 		# query 6 - add ties
-		# query 7
 		# query 8
 		# query 10
 		# query 12
@@ -226,8 +225,9 @@ def main():
 	'''
 		queries['q07'] = '''
 	SELECT f.title, f.female_cnt, m.male_cnt
-	FROM female_cast_cnt f LEFT OUTER JOIN 
-	male_cast_cnt m ON f.mid = m.mid
+	FROM female_cast_cnt f 
+	LEFT OUTER JOIN male_cast_cnt m 
+	ON f.mid = m.mid
 	WHERE f.female_cnt > m.male_cnt OR m.male_cnt ISNULL 
 	GROUP BY f.mid
 	ORDER BY f.title ASC;
@@ -281,6 +281,10 @@ def main():
 		# the same last name, but a different first name. Show the last name and the title of the movie,
 		# sorted alphabetically by last name.
 		queries['q10'] = '''
+	SELECT d.lname, m.title 
+	FROM Cast c, Movies m, Directors d, Actors a, Movie_Director md
+	WHERE md.mid = m.mid AND c.mid = md.mid AND d.did = md.did AND a.aid = c.aid AND d.lname = a.lname AND d.fname != a.fname
+	
 	'''
 
 
