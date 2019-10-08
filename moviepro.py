@@ -103,7 +103,6 @@ def main():
 		# query 3
 		# query 6 - add ties
 		# query 8
-		# query 10
 		# query 12
 
 	# Q01
@@ -134,10 +133,10 @@ def main():
 		# same movie, count that still as one movie. If there is a tie, use the actor's last and first name to
 		# generate a full sorted order.
 		queries['q03'] = '''
-	SELECT fname, lname
-	FROM Actors as A
-	WHERE aid in (SELECT aid, count(aid) as C FROM Movies as M INNER JOIN Cast as C on M.mid = C.mid WHERE M.title LIKE '%Star Wars%');
-	'''
+			SELECT fname, lname
+			FROM Actors as A
+			WHERE aid in (SELECT aid, count(aid) as C FROM Movies as M INNER JOIN Cast as C on M.mid = C.mid WHERE M.title LIKE '%Star Wars%');
+		'''
 
 
 
@@ -186,16 +185,16 @@ def main():
 	# # LIMIT 10;
 	# '''
 		queries['a1'] = '''
-	CREATE VIEW frequencies as
-	select m.title, count(aid) as cast_cnt
-	from Movies m, Cast c
-	where m.mid = c.mid
-	group by m.title;
-	'''
+			CREATE VIEW frequencies as
+			select m.title, count(aid) as cast_cnt
+			from Movies m, Cast c
+			where m.mid = c.mid
+			group by m.title;
+		'''
 		queries['q06'] = '''
-	SELECT *
-	FROM frequencies
-	ORDER BY cast_cnt DESC;
+			SELECT *
+			FROM frequencies
+			ORDER BY cast_cnt DESC;
 		'''
 		# WHERE cast_cnt = (select max(cast_cnt) from frequencies)
 
@@ -210,28 +209,28 @@ def main():
 		# title, the number of actresses, and the number of actors in the results. Sort alphabetically,
 		# by movie title.
 		queries['b2'] = '''
-	CREATE VIEW female_cast_cnt as
-	SELECT m.title, m.mid, count(*) as female_cnt
-	FROM Actors a, Cast c, Movies m 
-	WHERE m.mid = c.mid AND c.aid = a.aid AND a.gender = 'Female'
-	GROUP BY m.mid;
-	'''
+			CREATE VIEW female_cast_cnt as
+			SELECT m.title, m.mid, count(*) as female_cnt
+			FROM Actors a, Cast c, Movies m 
+			WHERE m.mid = c.mid AND c.aid = a.aid AND a.gender = 'Female'
+			GROUP BY m.mid;
+		'''
 		queries['b21'] = '''
-	CREATE VIEW male_cast_cnt as
-	SELECT m.mid, count(*) as male_cnt
-	FROM Actors a, Cast c, Movies m 
-	WHERE m.mid = c.mid AND c.aid = a.aid AND a.gender = 'Male'
-	GROUP BY m.mid;
-	'''
+			CREATE VIEW male_cast_cnt as
+			SELECT m.mid, count(*) as male_cnt
+			FROM Actors a, Cast c, Movies m 
+			WHERE m.mid = c.mid AND c.aid = a.aid AND a.gender = 'Male'
+			GROUP BY m.mid;
+		'''
 		queries['q07'] = '''
-	SELECT f.title, f.female_cnt, m.male_cnt
-	FROM female_cast_cnt f 
-	LEFT OUTER JOIN male_cast_cnt m 
-	ON f.mid = m.mid
-	WHERE f.female_cnt > m.male_cnt OR m.male_cnt ISNULL 
-	GROUP BY f.mid
-	ORDER BY f.title ASC;
-	'''
+			SELECT f.title, f.female_cnt, m.male_cnt
+			FROM female_cast_cnt f 
+			LEFT OUTER JOIN male_cast_cnt m 
+			ON f.mid = m.mid
+			WHERE f.female_cnt > m.male_cnt OR m.male_cnt ISNULL 
+			GROUP BY f.mid
+			ORDER BY f.title ASC;
+		'''
 
 
 
@@ -274,18 +273,13 @@ def main():
 			ORDER BY count(q.aid) desc 
 		'''
 
-
-
-
-	# Q10 - Find instances of nepotism between actors and directors, i.e., an actor in a movie and the director having
-		# the same last name, but a different first name. Show the last name and the title of the movie,
-		# sorted alphabetically by last name.
+	# Q10
 		queries['q10'] = '''
-	SELECT d.lname, m.title 
-	FROM Cast c, Movies m, Directors d, Actors a, Movie_Director md
-	WHERE md.mid = m.mid AND c.mid = md.mid AND d.did = md.did AND a.aid = c.aid AND d.lname = a.lname AND d.fname != a.fname
-	
-	'''
+			SELECT d.lname, m.title 
+			FROM Cast c, Movies m, Directors d, Actors a, Movie_Director md
+			WHERE md.mid = m.mid AND c.mid = md.mid AND d.did = md.did AND a.aid = c.aid AND d.lname = a.lname AND d.fname != a.fname
+			ORDER BY d.lname ASC;
+		'''
 
 
 
@@ -324,18 +318,19 @@ def main():
 			WHERE b.aid = a1.aid AND b.aid NOT IN (SELECT aid from Actors a WHERE a.lname = 'Bacon');
 		'''
 
-
-
-
-
-
 	# Q12 - Assume that the popularity of an actor is reflected by the average rank of all the movies he/she has acted
 		# in. Find the top 20 most popular actors (in descreasing order of popularity) -- list the actor's first/last
 		# name, the total number of movies he/she has acted, and his/her popularity score. For simplicity,
 		# feel free to ignore ties at the number 20 spot (i.e., always show up to 20 only).
+
 		queries['q12'] = '''
-		
-	'''
+			SELECT a.aid, a.fname, a.lname, count(c.mid), AVG(m.rank)
+			FROM Movies m, Actors a, Cast c
+			WHERE m.mid = c.mid AND a.aid = c.aid 
+			GROUP BY a.aid
+			ORDER BY AVG(m.rank) DESC
+			LIMIT 20;
+		'''
 
 
 
