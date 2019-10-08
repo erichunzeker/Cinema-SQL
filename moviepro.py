@@ -99,42 +99,31 @@ def main():
 		# DO NOT MODIFY - END
 	# 	INSERT YOUR QUERIES HERE
 
-	# 	NOTE: You are allowed to also include other queries here (e.g.,
-	# 	for creating views), that will be executed in alphabetical order.
-	# 	We will grade your program based on the output files q01.csv,
-	# 	q02.csv, ..., q12.csv
-
 	# TODO:
 		# query 3
 		# query 6 - add ties
 		# query 7
 		# query 8
-		# query 9
 		# query 10
 		# query 12
 
-	# Q01 - List all the actors (first and last name) who acted in at least one film in the 80s (1980-1990,
-	# 	both ends inclusive) and in at least one film in the 21st century (>=2000). Sort alphabetically,
-	# 	by the actor's last and first name.
+	# Q01
 		queries['q01'] = '''
-	SELECT fname, lname 
-	FROM Actors
-	WHERE aid in (SELECT aid FROM Movies as M1 INNER JOIN Cast as C1 on M1.mid = C1.mid where M1.year >= 1980 and M1.year <= 1990 
-			INTERSECT 
-		SELECT aid FROM Movies as M2 INNER JOIN Cast as C2 on M2.mid = C2.mid where M2.year >= 2000); 
-	'''
+			SELECT fname, lname 
+			FROM Actors
+			WHERE aid in (SELECT aid FROM Movies as M1 INNER JOIN Cast as C1 on M1.mid = C1.mid where M1.year >= 1980 and M1.year <= 1990 
+					INTERSECT 
+			SELECT aid FROM Movies as M2 INNER JOIN Cast as C2 on M2.mid = C2.mid where M2.year >= 2000); 
+		'''
 
-	# Q02 - List all the movies (title, year) that were released in the same year as the movie entitled "Rogue One: A
-		# Star Wars Story", but had a better rank (Note: the higher the value in the rank attribute, the better the
-		# rank of the movie). Sort alphabetically, by movie title.
+	# Q02
 		queries['q02'] = '''
-	SELECT title, year
-	FROM Movies
-	WHERE year = (SELECT year FROM Movies as M WHERE M.title = 'Rogue One: A Star Wars Story') and rank > 
-		(SELECT rank FROM Movies as M WHERE M.title = 'Rogue One: A Star Wars Story')
-	ORDER BY title ASC;
-	'''
-
+			SELECT title, year
+			FROM Movies
+			WHERE year = (SELECT year FROM Movies as M WHERE M.title = 'Rogue One: A Star Wars Story') and rank > 
+				(SELECT rank FROM Movies as M WHERE M.title = 'Rogue One: A Star Wars Story')
+			ORDER BY title ASC;
+		'''
 
 
 
@@ -145,44 +134,39 @@ def main():
 		# in decreasing order of how many Star Wars movies they appeared in. If an actor plays multiple roles in the
 		# same movie, count that still as one movie. If there is a tie, use the actor's last and first name to
 		# generate a full sorted order.
-		# todo: a lot lel
-	# 	queries['q03'] = '''
-	# SELECT fname, lname
-	# FROM Actors as A
-	# WHERE aid in (SELECT aid, count(aid) as C FROM Movies as M INNER JOIN Cast as C on M.mid = C.mid WHERE M.title LIKE '%Star Wars%')
-	# ORDER BY C	;
-	# '''
-
-
-
-
-
-
-
-	# Q04 - Find the actor(s)(first and last name) who only acted in films released before 1985. Sort alphabetically,
-	# 	by the actor's last and first name.
-		queries['q04'] = '''
+		queries['q03'] = '''
 	SELECT fname, lname
 	FROM Actors as A
-	INNER JOIN Cast as C on A.aid = C.aid
-	WHERE C.mid IN (
-		SELECT mid 
-		FROM Movies
-		WHERE year < 1985)
-	ORDER BY A.lname, A.fname ASC;
+	WHERE aid in (SELECT aid, count(aid) as C FROM Movies as M INNER JOIN Cast as C on M.mid = C.mid WHERE M.title LIKE '%Star Wars%');
 	'''
 
-	# Q05 - List the top 20 directors in descending order of the number of films they directed (first name, last name,
-		#  number of films directed). For simplicity, feel free to ignore ties at the number 20 spot (i.e.,
-		# always show up to 20 only).
+
+
+
+
+
+
+	# Q04
+		queries['q04'] = '''
+			SELECT fname, lname
+			FROM Actors as A
+			INNER JOIN Cast as C on A.aid = C.aid
+			WHERE C.mid IN (
+				SELECT mid 
+				FROM Movies
+				WHERE year < 1985)
+			ORDER BY A.lname, A.fname ASC;
+		'''
+
+	# Q05
 		queries['q05'] = '''
-	SELECT fname, lname, count(M.did)
-	FROM Movie_Director as M 
-	INNER JOIN Directors as D on M.did = D.did
-	GROUP BY M.did
-	ORDER BY count(M.did) DESC 
-	LIMIT 20;
-	'''
+			SELECT fname, lname, count(M.did)
+			FROM Movie_Director as M 
+			INNER JOIN Directors as D on M.did = D.did
+			GROUP BY M.did
+			ORDER BY count(M.did) DESC 
+			LIMIT 20;
+		'''
 
 
 
@@ -226,7 +210,26 @@ def main():
 	# Q07 - Find the movie(s) whose cast has more actresses than actors (i.e., gender=female vs gender=male). Show the
 		# title, the number of actresses, and the number of actors in the results. Sort alphabetically,
 		# by movie title.
+		queries['b2'] = '''
+	CREATE VIEW female_cast_cnt as
+	SELECT m.title, m.mid, count(*) as female_cnt
+	FROM Actors a, Cast c, Movies m 
+	WHERE m.mid = c.mid AND c.aid = a.aid AND a.gender = 'Female'
+	GROUP BY m.mid;
+	'''
+		queries['b21'] = '''
+	CREATE VIEW male_cast_cnt as
+	SELECT m.mid, count(*) as male_cnt
+	FROM Actors a, Cast c, Movies m 
+	WHERE m.mid = c.mid AND c.aid = a.aid AND a.gender = 'Male'
+	GROUP BY m.mid;
+	'''
 		queries['q07'] = '''
+	SELECT f.title, f.female_cnt, m.male_cnt
+	FROM female_cast_cnt f LEFT OUTER JOIN 
+	male_cast_cnt m ON f.mid = m.mid
+	WHERE f.female_cnt > m.male_cnt OR m.male_cnt ISNULL 
+	GROUP BY f.mid;
 	'''
 
 
@@ -250,27 +253,25 @@ def main():
 
 
 
-	# Q09 - For all actors whose first name starts with a T, count the movies that he/she appeared in his/her debut
-		# year (i.e., year of their first movie). Show the actor's first and last name, plus the count. Sort by
-		# decreasing order of the count.
+	# Q09
 		queries['aa1'] = '''
-	CREATE VIEW qualifying AS
-	SELECT a.aid, min(m.year) as yc
-	FROM Movies m, Actors a, Cast c
-	WHERE m.mid = c.mid AND a.aid = c.aid AND c.aid IN (
-		SELECT a1.aid 
-		FROM Actors	a1
-		WHERE lower(a1.fname) LIKE 'T%'
-	)
-	GROUP BY a.aid;
-	'''
+			CREATE VIEW qualifying AS
+			SELECT a.aid, min(m.year) as yc
+			FROM Movies m, Actors a, Cast c
+			WHERE m.mid = c.mid AND a.aid = c.aid AND c.aid IN (
+				SELECT a1.aid 
+				FROM Actors	a1
+				WHERE lower(a1.fname) LIKE 'T%'
+			)
+			GROUP BY a.aid;
+		'''
 		queries['q09'] = '''
-	SELECT a.fname, a.lname, count(q.aid)
-	FROM qualifying q, Actors a, Cast c, Movies m
-	WHERE q.aid = a.aid AND q.yc = m.year AND c.mid = m.mid AND c.aid = q.aid
-	GROUP BY q.aid
-	ORDER BY count(q.aid) desc 
-	'''
+			SELECT a.fname, a.lname, count(q.aid)
+			FROM qualifying q, Actors a, Cast c, Movies m
+			WHERE q.aid = a.aid AND q.yc = m.year AND c.mid = m.mid AND c.aid = q.aid
+			GROUP BY q.aid
+			ORDER BY count(q.aid) desc 
+		'''
 
 
 
@@ -291,32 +292,32 @@ def main():
 		#  with the concept, by visiting The Oracle of Bacon.
 
 		queries['a2'] = '''
-	create view bacon1 as
-	SELECT DISTINCT c1.aid 
-	FROM Cast c1
-	WHERE c1.mid in (
-		SELECT c.mid
-		FROM Cast c
-		WHERE c.aid = (SELECT a.aid 
-						FROM Actors a
-						WHERE a.lname = 'Bacon')
-	);
-	'''
+			create view bacon1 as
+			SELECT DISTINCT c1.aid 
+			FROM Cast c1
+			WHERE c1.mid in (
+				SELECT c.mid
+				FROM Cast c
+				WHERE c.aid = (SELECT a.aid 
+								FROM Actors a
+								WHERE a.lname = 'Bacon')
+			);
+		'''
 		queries['a3'] = '''
-	create view bacon2 as
-	SELECT DISTINCT c1.aid 
-	FROM Cast c1
-	WHERE c1.mid in (
-		SELECT c.mid
-		FROM Cast c
-		WHERE c.aid in (SELECT * FROM bacon1)
-	);
-	'''
+			create view bacon2 as
+			SELECT DISTINCT c1.aid 
+			FROM Cast c1
+			WHERE c1.mid in (
+				SELECT c.mid
+				FROM Cast c
+				WHERE c.aid in (SELECT * FROM bacon1)
+			);
+		'''
 		queries['q11'] = '''
-		SELECT a1.fname, a1.lname
-		FROM bacon2 b, Actors a1
-		WHERE b.aid = a1.aid AND b.aid NOT IN (SELECT aid from Actors a WHERE a.lname = 'Bacon');
-	'''
+			SELECT a1.fname, a1.lname
+			FROM bacon2 b, Actors a1
+			WHERE b.aid = a1.aid AND b.aid NOT IN (SELECT aid from Actors a WHERE a.lname = 'Bacon');
+		'''
 
 
 
