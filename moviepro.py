@@ -99,11 +99,6 @@ def main():
 		# DO NOT MODIFY - END
 	# 	INSERT YOUR QUERIES HERE
 
-
-	# TODO:
-		# query 6 - add ties
-		# query 8
-
 	# Q01
 		queries['q01'] = '''
 			SELECT fname, lname 
@@ -148,47 +143,37 @@ def main():
 			ORDER BY count(M.did) DESC 
 			LIMIT 20;
 		'''
-
-
-
-
-
-
-
-
-	# Q06 - Find the top 10 movies with the largest cast (title, number of cast members) in decreasing order. Note:
-		# show all movies in case of a tie.
-
-	# 	queries['q06'] = '''
-	# # SELECT title, count(title)
-	# # FROM Movies as M
-	# # INNER JOIN Cast as C on M.mid = C.mid
-	# # GROUP BY title
-	# # ORDER BY count(title) DESC
-	# # LIMIT 10;
-	# '''
-		queries['a1'] = '''
-			CREATE VIEW frequencies as
-			select m.title, count(aid) as cast_cnt
+	# Q06
+		queries['d1'] = '''
+			CREATE VIEW cnt_limited as
+			select count(aid) as cast_cnt
 			from Movies m, Cast c
 			where m.mid = c.mid
-			group by m.mid;
-		'''
-		queries['q06'] = '''
-			SELECT *
-			FROM frequencies
-			ORDER BY cast_cnt DESC
+			group by m.mid
+			order by cast_cnt DESC
 			LIMIT 10;
 		'''
-		# WHERE cast_cnt = (select max(cast_cnt) from frequencies)
 
+		queries['d3'] = '''
+					CREATE VIEW lowest as
+					select min(cast_cnt) as lowest
+					from cnt_limited;
+				'''
 
+		queries['d2'] = '''
+					CREATE VIEW cnt_all as
+					select m.title as title, count(aid) as cast_cnt
+					from Movies m, Cast c
+					where m.mid = c.mid 
+					group by m.mid
+					order by cast_cnt DESC;
+				'''
 
-
-
-
-
-
+		queries['q06'] = '''
+			select a.title, a.cast_cnt
+			from cnt_all a, lowest low
+			WHERE a.cast_cnt >= low.lowest
+		'''
 	# Q07
 		queries['b2'] = '''
 			CREATE VIEW female_cast_cnt as
@@ -213,20 +198,7 @@ def main():
 			GROUP BY f.mid
 			ORDER BY f.title ASC;
 		'''
-
-
-
-
-
-
-
-	# Q08 - Find all the actors who have worked with at least 7 different directors. Do not consider cases of
-		# self-directing (i.e., when the director is also an actor in a movie), but count all directors in a movie
-		# towards the threshold of 7 directors. Show the actor's first, last name, and the number of directors he/she
-		# has worked with. Sort in decreasing order of number of directors.
-
-		# add directors
-
+	# Q08
 		queries['b1'] = '''
 			CREATE VIEW dir_cnt as
 			SELECT a.aid, a.fname, a.lname, count(DISTINCT md.did) as co_cnt
@@ -241,10 +213,6 @@ def main():
 			WHERE co_cnt > 6
 			ORDER BY co_cnt DESC;
 		'''
-
-
-
-
 	# Q09
 		queries['aa1'] = '''
 			CREATE VIEW qualifying AS
