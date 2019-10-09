@@ -153,22 +153,19 @@ def main():
 			order by cast_cnt DESC
 			LIMIT 10;
 		'''
-
 		queries['d3'] = '''
-					CREATE VIEW lowest as
-					select min(cast_cnt) as lowest
-					from cnt_limited;
-				'''
-
+			CREATE VIEW lowest as
+			select min(cast_cnt) as lowest
+			from cnt_limited;
+		'''
 		queries['d2'] = '''
-					CREATE VIEW cnt_all as
-					select m.title as title, count(aid) as cast_cnt
-					from Movies m, Cast c
-					where m.mid = c.mid 
-					group by m.mid
-					order by cast_cnt DESC;
-				'''
-
+			CREATE VIEW cnt_all as
+			select m.title as title, count(aid) as cast_cnt
+			from Movies m, Cast c
+			where m.mid = c.mid 
+			group by m.mid
+			order by cast_cnt DESC;
+		'''
 		queries['q06'] = '''
 			select a.title, a.cast_cnt
 			from cnt_all a, lowest low
