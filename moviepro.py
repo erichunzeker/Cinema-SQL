@@ -99,11 +99,11 @@ def main():
 		# DO NOT MODIFY - END
 	# 	INSERT YOUR QUERIES HERE
 
+
 	# TODO:
 		# query 3
 		# query 6 - add ties
 		# query 8
-		# query 12
 
 	# Q01
 		queries['q01'] = '''
@@ -132,10 +132,13 @@ def main():
 		# in decreasing order of how many Star Wars movies they appeared in. If an actor plays multiple roles in the
 		# same movie, count that still as one movie. If there is a tie, use the actor's last and first name to
 		# generate a full sorted order.
+
 		queries['q03'] = '''
-			SELECT fname, lname
-			FROM Actors as A
-			WHERE aid in (SELECT aid, count(aid) as C FROM Movies as M INNER JOIN Cast as C on M.mid = C.mid WHERE M.title LIKE '%Star Wars%');
+			SELECT a.aid, a.fname, a.lname, count(DISTINCT c.mid) as mv_cnt
+			FROM Movies m, Cast c, Actors a
+			WHERE m.mid = c.mid AND a.aid = c.aid AND m.title LIKE "%Star Wars%"
+			GROUP BY a.aid
+			ORDER BY mv_cnt DESC, a.lname ASC, a.fname ASC;
 		'''
 
 
@@ -239,16 +242,20 @@ def main():
 
 
 
+
 	# Q08 - Find all the actors who have worked with at least 7 different directors. Do not consider cases of
 		# self-directing (i.e., when the director is also an actor in a movie), but count all directors in a movie
 		# towards the threshold of 7 directors. Show the actor's first, last name, and the number of directors he/she
 		# has worked with. Sort in decreasing order of number of directors.
+
+		# add directors
+
 		queries['q08'] = '''
-	'''
-
-
-
-
+			SELECT a.aid, count(md.did)
+			FROM Movies m, Actors a, Cast c, Movie_Director md, Directors d
+			WHERE m.mid = c.mid AND m.mid = md.mid AND md.did = d.did AND c.aid = a.aid
+			GROUP BY a.aid;
+		'''
 
 
 
@@ -281,15 +288,7 @@ def main():
 			ORDER BY d.lname ASC;
 		'''
 
-
-
-
-	# Q11 - The Bacon number of an actor is the length of the shortest path between the actor and Kevin Bacon in the
-		# "co-acting" graph. That is, Kevin Bacon has Bacon number 0; all actors who acted in the same movie as him
-		# have Bacon number 1; all actors who acted in the same film as some actor with Bacon number 1 have Bacon
-		# number 2, etc. List all actors whose Bacon number is 2 (first name, last name). You can familiarize yourself
-		#  with the concept, by visiting The Oracle of Bacon.
-
+	# Q11
 		queries['a2'] = '''
 			create view bacon1 as
 			SELECT DISTINCT c1.aid 
@@ -318,11 +317,7 @@ def main():
 			WHERE b.aid = a1.aid AND b.aid NOT IN (SELECT aid from Actors a WHERE a.lname = 'Bacon');
 		'''
 
-	# Q12 - Assume that the popularity of an actor is reflected by the average rank of all the movies he/she has acted
-		# in. Find the top 20 most popular actors (in descreasing order of popularity) -- list the actor's first/last
-		# name, the total number of movies he/she has acted, and his/her popularity score. For simplicity,
-		# feel free to ignore ties at the number 20 spot (i.e., always show up to 20 only).
-
+	# Q12
 		queries['q12'] = '''
 			SELECT a.aid, a.fname, a.lname, count(c.mid), AVG(m.rank)
 			FROM Movies m, Actors a, Cast c
@@ -331,11 +326,6 @@ def main():
 			ORDER BY AVG(m.rank) DESC
 			LIMIT 20;
 		'''
-
-
-
-
-
 
 	# 	########################################################################
 	# 	### SAVE RESULTS TO FILES ##############################################
