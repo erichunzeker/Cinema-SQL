@@ -101,7 +101,6 @@ def main():
 
 
 	# TODO:
-		# query 3
 		# query 6 - add ties
 		# query 8
 
@@ -113,7 +112,6 @@ def main():
 					INTERSECT 
 			SELECT aid FROM Movies as M2 INNER JOIN Cast as C2 on M2.mid = C2.mid where M2.year >= 2000); 
 		'''
-
 	# Q02
 		queries['q02'] = '''
 			SELECT title, year
@@ -122,17 +120,7 @@ def main():
 				(SELECT rank FROM Movies as M WHERE M.title = 'Rogue One: A Star Wars Story')
 			ORDER BY title ASC;
 		'''
-
-
-
-
-
-
-	# Q03 - List all the actors (first and last name) who played in a Star Wars movie (i.e., title like '%Star Wars%')
-		# in decreasing order of how many Star Wars movies they appeared in. If an actor plays multiple roles in the
-		# same movie, count that still as one movie. If there is a tie, use the actor's last and first name to
-		# generate a full sorted order.
-
+	# Q03
 		queries['q03'] = '''
 			SELECT a.aid, a.fname, a.lname, count(DISTINCT c.mid) as mv_cnt
 			FROM Movies m, Cast c, Actors a
@@ -140,13 +128,6 @@ def main():
 			GROUP BY a.aid
 			ORDER BY mv_cnt DESC, a.lname ASC, a.fname ASC;
 		'''
-
-
-
-
-
-
-
 	# Q04
 		queries['q04'] = '''
 			SELECT fname, lname
@@ -158,7 +139,6 @@ def main():
 				WHERE year < 1985)
 			ORDER BY A.lname, A.fname ASC;
 		'''
-
 	# Q05
 		queries['q05'] = '''
 			SELECT fname, lname, count(M.did)
@@ -178,7 +158,7 @@ def main():
 
 	# Q06 - Find the top 10 movies with the largest cast (title, number of cast members) in decreasing order. Note:
 		# show all movies in case of a tie.
-		# todo: add ties
+
 	# 	queries['q06'] = '''
 	# # SELECT title, count(title)
 	# # FROM Movies as M
@@ -192,12 +172,13 @@ def main():
 			select m.title, count(aid) as cast_cnt
 			from Movies m, Cast c
 			where m.mid = c.mid
-			group by m.title;
+			group by m.mid;
 		'''
 		queries['q06'] = '''
 			SELECT *
 			FROM frequencies
-			ORDER BY cast_cnt DESC;
+			ORDER BY cast_cnt DESC
+			LIMIT 10;
 		'''
 		# WHERE cast_cnt = (select max(cast_cnt) from frequencies)
 
@@ -208,9 +189,7 @@ def main():
 
 
 
-	# Q07 - Find the movie(s) whose cast has more actresses than actors (i.e., gender=female vs gender=male). Show the
-		# title, the number of actresses, and the number of actors in the results. Sort alphabetically,
-		# by movie title.
+	# Q07
 		queries['b2'] = '''
 			CREATE VIEW female_cast_cnt as
 			SELECT m.title, m.mid, count(*) as female_cnt
@@ -241,8 +220,6 @@ def main():
 
 
 
-
-
 	# Q08 - Find all the actors who have worked with at least 7 different directors. Do not consider cases of
 		# self-directing (i.e., when the director is also an actor in a movie), but count all directors in a movie
 		# towards the threshold of 7 directors. Show the actor's first, last name, and the number of directors he/she
@@ -250,11 +227,19 @@ def main():
 
 		# add directors
 
-		queries['q08'] = '''
-			SELECT a.aid, count(md.did)
+		queries['b1'] = '''
+			CREATE VIEW dir_cnt as
+			SELECT a.aid, a.fname, a.lname, count(DISTINCT md.did) as co_cnt
 			FROM Movies m, Actors a, Cast c, Movie_Director md, Directors d
-			WHERE m.mid = c.mid AND m.mid = md.mid AND md.did = d.did AND c.aid = a.aid
+			WHERE m.mid = c.mid AND m.mid = md.mid AND md.did = d.did AND c.aid = a.aid 
 			GROUP BY a.aid;
+		'''
+
+		queries['q08'] = '''
+			SELECT * 
+			FROM dir_cnt
+			WHERE co_cnt > 6
+			ORDER BY co_cnt DESC;
 		'''
 
 
